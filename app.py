@@ -159,23 +159,21 @@ def analyze_plant():
         return jsonify({'error': 'No media files selected'}), 400
 
     query = (
-    "Analyze the uploaded image or video of a plant.\n\n"
-    "1. First, identify the plant type (e.g., maize, tomato, cassava, etc).\n"
-    "2. Then, determine if the plant is healthy or affected by any disease or pest.\n"
-    "   - If it's healthy, clearly state 'Healthy' as the disease status.\n"
-    "   - If diseased or pest-infested, provide the specific name of the disease or pest and explain what causes it.\n"
-    "   - For maize (corn), also check for common diseases (like rust, blight, leaf spot) and pests (like fall armyworm, borers, aphids, etc).\n"
-    "   - Make sure the disease status mentions the pest if it is pest-related.\n"
-    "   - For other plants, identify any relevant diseases or pests affecting them.\n"
-    "3. Next, give detailed control or treatment advice.\n"
-    "   - This should be 2–3 lines long.\n"
-    "   - Include actions like chemical or organic treatment, crop rotation, sanitation, field hygiene, or use of resistant varieties.\n"
-    "   - Make it practical and clearly applicable for a farmer.\n\n"
-    "Respond using this format:\n"
-    "1. Plant type:\n"
-    "2. Disease status:\n"
-    "3. Control or treatment:"
-)
+        "Analyze the uploaded image or video of a plant.\n\n"
+        "1. First, identify the plant type (e.g., maize, tomato, cassava, etc).\n"
+        "2. Then, determine if the plant is healthy or affected by any disease.\n"
+        "   - If it's healthy, clearly state 'Healthy' as the disease status.\n"
+        "   - If it's not a plant, clearly state 'Not a plant' as disease status.\n"
+        "   - If diseased, provide the specific name of the disease and explain what causes it.\n"
+        "3. Next, give detailed control or treatment advice.\n"
+        "   - This should be 2–3 lines long.\n"
+        "   - Include actions like chemical treatment, crop rotation, field hygiene, and resistant varieties.\n"
+        "   - Make it practical and clear enough for a farmer to apply.\n\n"
+        "Respond using this format:\n"
+        "1. Plant type:\n"
+        "2. Disease status:\n"
+        "3. Control or treatment:"
+    )
 
     asset_ids, media_tags, file_paths = [], [], []
 
