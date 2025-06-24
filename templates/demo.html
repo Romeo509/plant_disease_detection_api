@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Plant Disease Identifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 200px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+
+        .file-input-label.dragover {
+            border-color: #667eea;
+            background: #e6fffa;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .upload-subtext {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .selected-files {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0fff4;
+            border-radius: 10px;
+            border-left: 4px solid #48bb78;
+        }
+
+        .selected-files h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            color: #4a5568;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item::before {
+            content: "📁";
+            margin-right: 8px;
+        }
+
+        .image-preview-section {
+            margin-top: 20px;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            transition: transform 0.2s ease;
+        }
+
+        .preview-item:hover {
+            transform: scale(1.02);
+            border-color: #667eea;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview-video {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .preview-info {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .preview-filename {
+            font-size: 0.85rem;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+
+        .preview-filesize {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        .video-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-content {
+            color: #4a5568;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .plant-type .result-title::before { content: "🌱 "; }
+        .disease-status .result-title::before { content: "🔍 "; }
+        .control-treatment .result-title::before { content: "💊 "; }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .success {
+            background: #f0fff4;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #48bb78;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .file-input-label {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌿 Plant Disease Identifier</h1>
+            <p>Upload photos or videos of your plants to get instant disease diagnosis, causes, and treatment recommendations powered by AI.</p>
+        </div>
+
+        <form id="uploadForm">
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" id="mediaInput" name="media" class="file-input" multiple accept="image/*,video/mp4">
+                    <label for="mediaInput" class="file-input-label" id="fileLabel">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-subtext">Support: JPG, PNG, JPEG, MP4 (Max 16MB)</div>
+                    </label>
+                </div>
+                
+                <div id="selectedFiles" class="selected-files" style="display: none;">
+                    <h3>Selected Files:</h3>
+                    <ul id="fileList" class="file-list"></ul>
+                    
+                    <div class="image-preview-section">
+                        <div id="previewGrid" class="preview-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="analyzeBtn" class="analyze-btn">
+                🔬 Analyze Plant Disease
+            </button>
+        </form>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Analyzing your plant images using AI...</p>
+        </div>
+
+        <div id="results" class="results">
+            <div id="plantType" class="result-card plant-type">
+                <div class="result-title">Plant Type</div>
+                <div class="result-content" id="plantTypeContent"></div>
+            </div>
+            
+            <div id="diseaseStatus" class="result-card disease-status">
+                <div class="result-title">Disease Status</div>
+                <div class="result-content" id="diseaseStatusContent"></div>
+            </div>
+            
+            <div id="controlTreatment" class="result-card control-treatment">
+                <div class="result-title">Control & Treatment</div>
+                <div class="result-content" id="controlTreatmentContent"></div>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('mediaInput');
+        const fileLabel = document.getElementById('fileLabel');
+        const selectedFiles = document.getElementById('selectedFiles');
+        const fileList = document.getElementById('fileList');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const message = document.getElementById('message');
+
+        // File drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileLabel.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            fileLabel.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            fileLabel.classList.remove('dragover');
+        }
+
+        fileLabel.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            displaySelectedFiles(files);
+        }
+
+        fileInput.addEventListener('change', function(e) {
+            displaySelectedFiles(e.target.files);
+        });
+
+        function displaySelectedFiles(files) {
+            if (files.length > 0) {
+                selectedFiles.style.display = 'block';
+                fileList.innerHTML = '';
+                const previewGrid = document.getElementById('previewGrid');
+                previewGrid.innerHTML = '';
+                
+                Array.from(files).forEach(file => {
+                    // Add to file list
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileList.appendChild(li);
+                    
+                    // Create preview
+                    createFilePreview(file, previewGrid);
+                });
+                analyzeBtn.disabled = false;
+            } else {
+                selectedFiles.style.display = 'none';
+                analyzeBtn.disabled = true;
+            }
+        }
+
+        function createFilePreview(file, container) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const isVideo = file.type.startsWith('video/');
+                
+                let mediaElement;
+                if (isVideo) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.className = 'preview-video';
+                    mediaElement.src = e.target.result;
+                    mediaElement.controls = false;
+                    mediaElement.muted = true;
+                    
+                    // Add video indicator
+                    const videoIndicator = document.createElement('div');
+                    videoIndicator.className = 'video-indicator';
+                    videoIndicator.textContent = '🎥 VIDEO';
+                    previewItem.appendChild(videoIndicator);
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.className = 'preview-image';
+                    mediaElement.src = e.target.result;
+                    mediaElement.alt = file.name;
+                }
+                
+                previewItem.appendChild(mediaElement);
+                
+                // Add file info
+                const previewInfo = document.createElement('div');
+                previewInfo.className = 'preview-info';
+                
+                const fileName = document.createElement('div');
+                fileName.className = 'preview-filename';
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('div');
+                fileSize.className = 'preview-filesize';
+                fileSize.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+                
+                previewInfo.appendChild(fileName);
+                previewInfo.appendChild(fileSize);
+                previewItem.appendChild(previewInfo);
+                
+                container.appendChild(previewItem);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showMessage('Please select at least one file.', 'error');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            message.innerHTML = '';
+            analyzeBtn.disabled = true;
+
+            const formData = new FormData();
+            Array.from(fileInput.files).forEach(file => {
+                formData.append('media', file);
+            });
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.analysis);
+                    showMessage('Analysis completed successfully!', 'success');
+                } else {
+                    showMessage(data.error || 'Analysis failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                loading.style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        });
+
+        function displayResults(analysis) {
+            document.getElementById('plantTypeContent').textContent = analysis.plant_type;
+            document.getElementById('diseaseStatusContent').textContent = analysis.disease_status;
+            document.getElementById('controlTreatmentContent').textContent = analysis.control_treatment;
+            results.style.display = 'block';
+        }
+
+        function showMessage(text, type) {
+            message.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => {
+                message.innerHTML = '';
+            }, 5000);
+        }
+
+        // Initialize
+        analyzeBtn.disabled = true;
+    </script>
+</body>
+</html>
