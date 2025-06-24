@@ -160,22 +160,15 @@ def analyze_plant():
 
     query = (
     "Analyze the uploaded image or video of a plant.\n\n"
-    "1. First, identify the plant type (e.g., maize, tomato, cassava, etc).\n"
-    "2. Then, determine if the plant is healthy or affected by any disease or pest.\n"
-    "   - If it's healthy, clearly state 'Healthy' as the disease status.\n"
-    "   - If it's not a plant, clearly state 'Not a plant' as disease status.\n"
-    "   - If diseased or pest-infested, provide the specific name of the disease or pest and explain what causes it.\n"
-    "   - If the issue is pest-related, the disease status must include the pest name and how it affects the plant.\n"
-    "   - For maize (corn), specifically check for common pests (e.g., fall armyworm, borers) and diseases (e.g., rust, blight).\n"
-    "3. Next, give detailed control or treatment advice.\n"
-    "   - This should be 2–3 lines long.\n"
-    "   - Include actions like chemical or organic treatment, crop rotation, sanitation, field hygiene, or use of resistant varieties.\n"
-    "   - Make it practical and clear enough for a farmer to apply.\n\n"
+    "1. Identify the plant type.\n"
+    "2. State what the plant is affected by. If it's healthy, say 'Healthy'. If it's not a plant, say 'Not a plant'. If it's affected by a disease or pest, give the name and explain the cause.\n"
+    "3. Provide clear and practical measures to control or treat the issue.\n\n"
     "Respond using this format:\n"
     "1. Plant type:\n"
     "2. Disease status:\n"
     "3. Control or treatment:"
 )
+
 
 
     asset_ids, media_tags, file_paths = [], [], []
