@@ -158,7 +158,7 @@ def analyze_plant():
     if not files or files[0].filename == '':
         return jsonify({'error': 'No media files selected'}), 400
 
-   query = (
+  query = (
     "Analyze the uploaded image or video. You are only expected to assess **corn (maize)** plants from Ghana.\n\n"
     "Check specifically for the following known corn issues in Ghana:\n"
     "- Maize Streak Virus (disease)\n"
@@ -186,7 +186,6 @@ def analyze_plant():
     "2. Disease status:\n"
     "3. Control or treatment:"
 )
-
 
 
 
