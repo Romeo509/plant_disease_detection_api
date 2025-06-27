@@ -63,23 +63,21 @@ def _delete_asset(asset_id):
     requests.delete(f"{kNvcfAssetUrl}/{asset_id}", headers=headers)
 
 def parse_ai_response(content):
-    """Parse the AI response to extract structured information"""
     lines = content.strip().split('\n')
     result = {
         'plant_type': 'Unknown',
         'disease_status': 'Unknown',
         'control_treatment': 'No treatment information available'
     }
-    
+
     current_section = None
     for line in lines:
         line = line.strip()
         if not line:
             continue
-            
+
         if line.startswith('1.') and 'plant type' in line.lower():
             current_section = 'plant_type'
-            # Extract content after the colon
             parts = line.split(':', 1)
             if len(parts) > 1:
                 result['plant_type'] = parts[1].strip()
@@ -94,12 +92,11 @@ def parse_ai_response(content):
             if len(parts) > 1:
                 result['control_treatment'] = parts[1].strip()
         elif current_section and not line.startswith(('1.', '2.', '3.')):
-            # Continue building the current section
             if result[current_section] == 'Unknown' or result[current_section] == 'No treatment information available':
                 result[current_section] = line
             else:
                 result[current_section] += ' ' + line
-    
+
     return result
 
 @app.route('/')
@@ -112,7 +109,6 @@ def api_docs():
 
 @app.route('/api/info')
 def api_info():
-    """Get API information and endpoints"""
     return jsonify({
         'name': 'Plant Disease Identifier API',
         'version': '1.0.0',
@@ -150,45 +146,41 @@ def api_info():
 
 @app.route('/analyze', methods=['POST'])
 def analyze_plant():
-    """Analyze uploaded plant media and identify diseases, causes, and control measures."""
     if 'media' not in request.files:
         return jsonify({'error': 'No media files uploaded'}), 400
-    
+
     files = request.files.getlist('media')
     if not files or files[0].filename == '':
         return jsonify({'error': 'No media files selected'}), 400
 
-  query = (
-    "Analyze the uploaded image or video. You are only expected to assess **corn (maize)** plants from Ghana.\n\n"
-    "Check specifically for the following known corn issues in Ghana:\n"
-    "- Maize Streak Virus (disease)\n"
-    "- Northern Corn Leaf Blight (disease)\n"
-    "- Common Rust (disease)\n"
-    "- Fall Armyworm (pest)\n"
-    "- Stem Borers (pest)\n"
-    "- Maize Weevils (post-harvest pest)\n\n"
-    "Do NOT use vague terms like 'worm' or 'caterpillar'. Always use the exact name such as 'Fall Armyworm' or 'Stem Borer'.\n"
-    "Do NOT recommend actions like 'handpicking pests' or introducing foreign insects like ladybugs — these are not practical.\n\n"
-    "Use these visual identification tips:\n"
-    "- **Common Rust**: Many **small, round, reddish-brown pustules**, like rust dots, often on both sides of the leaf.\n"
-    "- **Northern Corn Leaf Blight**: **Long, grayish or tan, cigar-shaped lesions** (like slashes), mostly on lower leaves.\n\n"
-    "If the image is NOT a maize plant, respond with:\n"
-    "1. Plant type: Not maize\n"
-    "2. Disease status: Not applicable\n"
-    "3. Control or treatment: Not applicable\n\n"
-    "If the maize plant is healthy, clearly state: 'Healthy'.\n\n"
-    "For affected plants, give clear and **practical** control or treatment measures — 2 to 3 lines maximum — using only real-world solutions applicable to Ghanaian farmers, such as:\n"
-    "- Use of approved pesticides (e.g., emamectin benzoate, neem-based products, tebuconazole)\n"
-    "- Planting resistant varieties, early planting, proper drying and storage, crop rotation\n"
-    "- Field hygiene and timely removal of infected plant debris\n\n"
-    "Respond using this exact format:\n"
-    "1. Plant type:\n"
-    "2. Disease status:\n"
-    "3. Control or treatment:"
-)
-
-
-
+    query = (
+        "Analyze the uploaded image or video. You are only expected to assess **corn (maize)** plants from Ghana.\n\n"
+        "Check specifically for the following known corn issues in Ghana:\n"
+        "- Maize Streak Virus (disease)\n"
+        "- Northern Corn Leaf Blight (disease)\n"
+        "- Common Rust (disease)\n"
+        "- Fall Armyworm (pest)\n"
+        "- Stem Borers (pest)\n"
+        "- Maize Weevils (post-harvest pest)\n\n"
+        "Do NOT use vague terms like 'worm' or 'caterpillar'. Always use the exact name such as 'Fall Armyworm' or 'Stem Borer'.\n"
+        "Do NOT recommend actions like 'handpicking pests' or introducing foreign insects like ladybugs — these are not practical.\n\n"
+        "Use these visual identification tips:\n"
+        "- **Common Rust**: Many **small, round, reddish-brown pustules**, like rust dots, often on both sides of the leaf.\n"
+        "- **Northern Corn Leaf Blight**: **Long, grayish or tan, cigar-shaped lesions** (like slashes), mostly on lower leaves.\n\n"
+        "If the image is NOT a maize plant, respond with:\n"
+        "1. Plant type: Not maize\n"
+        "2. Disease status: Not applicable\n"
+        "3. Control or treatment: Not applicable\n\n"
+        "If the maize plant is healthy, clearly state: 'Healthy'.\n\n"
+        "For affected plants, give clear and practical control or treatment measures — 2 to 3 lines maximum — using only real-world solutions applicable to Ghanaian farmers, such as:\n"
+        "- Use of approved pesticides (e.g., emamectin benzoate, neem-based products, tebuconazole)\n"
+        "- Planting resistant varieties, early planting, proper drying and storage, crop rotation\n"
+        "- Field hygiene and timely removal of infected plant debris\n\n"
+        "Respond using this exact format:\n"
+        "1. Plant type:\n"
+        "2. Disease status:\n"
+        "3. Control or treatment:"
+    )
 
     asset_ids, media_tags, file_paths = [], [], []
 
@@ -196,7 +188,7 @@ def analyze_plant():
         for file in files:
             if file.filename == '':
                 continue
-                
+
             ext = get_ext(file.filename)
             if ext not in kSupportedList:
                 return jsonify({'error': f'{file.filename} format not supported'}), 400
@@ -234,7 +226,6 @@ def analyze_plant():
         res = requests.post(INVOKE_URL, headers=headers, json=payload)
         result = res.json()
 
-        # Parse the AI response
         if 'choices' in result and len(result['choices']) > 0:
             content = result['choices'][0]['message']['content']
             parsed_result = parse_ai_response(content)
@@ -248,9 +239,8 @@ def analyze_plant():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     finally:
-        # Cleanup
         for asset_id in asset_ids:
             try:
                 _delete_asset(asset_id)
