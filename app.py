@@ -159,15 +159,30 @@ def analyze_plant():
         return jsonify({'error': 'No media files selected'}), 400
 
     query = (
-    "Analyze the uploaded image or video of a plant.\n\n"
-    "1. Identify the plant type.\n"
-    "2. State what the plant is affected by. If it's healthy, say 'Healthy'. If it's not a plant, say 'Not a plant'. If it's affected by a disease or pest, give the name and explain the cause.\n"
-    "3. Provide clear and practical measures to control or treat the issue.\n\n"
-    "Respond using this format:\n"
-    "1. Plant type:\n"
-    "2. Disease status:\n"
-    "3. Control or treatment:"
+    "You are analyzing an uploaded image or video of a corn (maize) plant in Ghana.\n\n"
+    "Only check for the following known corn issues:\n"
+    "- Maize Streak Virus (disease)\n"
+    "- Northern Corn Leaf Blight (disease)\n"
+    "- Common Rust (disease)\n"
+    "- Fall Armyworm (pest)\n"
+    "- Stem Borers (pest)\n"
+    "- Maize Weevils (post-harvest pest)\n\n"
+    "Do NOT mention vague terms like 'caterpillar' or 'worm' — if you identify a pest, use the correct name such as 'Fall Armyworm' or 'Stem Borer'.\n\n"
+    "When suggesting control or treatment, only give practical solutions used in Ghanaian farming contexts. DO NOT recommend introducing foreign species like ladybugs or lacewings.\n"
+    "Preferred control methods should include:\n"
+    "- Recommended local pesticides (like emamectin benzoate or neem-based solutions)\n"
+    "- Cultural practices (e.g., early planting, handpicking, crop rotation)\n"
+    "- Integrated Pest Management (IPM) where applicable\n\n"
+    "If the plant is healthy, clearly state: 'Healthy'.\n\n"
+    "Format your response like this:\n"
+    "1. Plant type: Maize (corn)\n"
+    "2. Disease or pest status:\n"
+    "   - Name:\n"
+    "   - Type:\n"
+    "   - Main impact:\n"
+    "   - Control or treatment:"
 )
+
 
 
 
