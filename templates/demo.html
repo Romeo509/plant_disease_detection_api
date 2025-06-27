@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌿 Plant Disease Identifier</title>
+    <title>🌿 Enhanced Plant Disease Identifier</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             animation: slideUp 0.6s ease-out;
         }
@@ -59,6 +59,31 @@
             color: #718096;
             font-size: 1.1rem;
             line-height: 1.6;
+        }
+
+        .plant-type-section {
+            margin-bottom: 20px;
+        }
+
+        .plant-type-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .plant-type-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .plant-type-input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .upload-section {
@@ -274,6 +299,11 @@
             100% { transform: rotate(360deg); }
         }
 
+        .loading-text {
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
         .results {
             display: none;
             margin-top: 30px;
@@ -291,18 +321,19 @@
             padding: 25px;
             margin-bottom: 20px;
             border-left: 5px solid #667eea;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .result-card:hover {
             transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .result-title {
             font-size: 1.3rem;
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
         }
@@ -313,9 +344,62 @@
             line-height: 1.6;
         }
 
-        .plant-type .result-title::before { content: "🌱 "; }
-        .disease-status .result-title::before { content: "🔍 "; }
-        .control-treatment .result-title::before { content: "💊 "; }
+        .result-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: #e6fffa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .severity-mild { background: #f0fff4; color: #2f855a; }
+        .severity-moderate { background: #fffbeb; color: #d69e2e; }
+        .severity-severe { background: #fed7d7; color: #c53030; }
+        .severity-critical { background: #fed7d7; color: #9b2c2c; }
+
+        .confidence-high { background: #f0fff4; color: #2f855a; }
+        .confidence-medium { background: #fffbeb; color: #d69e2e; }
+        .confidence-low { background: #fed7d7; color: #c53030; }
+
+        /* Different colors for different result types */
+        .plant-identification { border-left-color: #48bb78; }
+        .plant-identification .result-title::before { content: "🌱 "; }
+
+        .health-status { border-left-color: #ed8936; }
+        .health-status .result-title::before { content: "🔍 "; }
+
+        .disease-details { border-left-color: #e53e3e; }
+        .disease-details .result-title::before { content: "🦠 "; }
+
+        .symptoms { border-left-color: #9f7aea; }
+        .symptoms .result-title::before { content: "📋 "; }
+
+        .treatment { border-left-color: #38b2ac; }
+        .treatment .result-title::before { content: "💊 "; }
+
+        .prevention { border-left-color: #4299e1; }
+        .prevention .result-title::before { content: "🛡️ "; }
+
+        .processing-info {
+            background: #edf2f7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .processing-info strong {
+            color: #2d3748;
+        }
 
         .error {
             background: #fed7d7;
@@ -348,24 +432,36 @@
             .file-input-label {
                 height: 150px;
             }
+
+            .result-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌿 Plant Disease Identifier</h1>
-            <p>Upload photos or videos of your plants to get instant disease diagnosis, causes, and treatment recommendations powered by AI.</p>
+            <h1>🌿 Enhanced Plant Disease Identifier</h1>
+            <p>Upload photos or videos of your plants to get comprehensive disease analysis with AI-powered diagnosis, severity assessment, and localized treatment recommendations.</p>
         </div>
 
         <form id="uploadForm">
+            <div class="plant-type-section">
+                <label for="plantType">Expected Plant Type (Optional):</label>
+                <input type="text" id="plantType" name="plant_type" class="plant-type-input" 
+                       placeholder="e.g., corn, tomato, pepper, cassava..." 
+                       autocomplete="off">
+            </div>
+
             <div class="upload-section">
                 <div class="file-input-wrapper">
-                    <input type="file" id="mediaInput" name="media" class="file-input" multiple accept="image/*,video/mp4">
+                    <input type="file" id="mediaInput" name="media" class="file-input" multiple accept="image/*,video/mp4,video/avi,video/mov">
                     <label for="mediaInput" class="file-input-label" id="fileLabel">
                         <div class="upload-icon">📸</div>
                         <div class="upload-text">Click to upload or drag and drop</div>
-                        <div class="upload-subtext">Support: JPG, PNG, JPEG, MP4 (Max 16MB)</div>
+                        <div class="upload-subtext">Support: JPG, PNG, JPEG, WebP, BMP, MP4, AVI, MOV (Max 16MB each)</div>
                     </label>
                 </div>
                 
@@ -380,29 +476,53 @@
             </div>
 
             <button type="submit" id="analyzeBtn" class="analyze-btn">
-                🔬 Analyze Plant Disease
+                🔬 Analyze Plant Health
             </button>
         </form>
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>Analyzing your plant images</p>
+            <p class="loading-text">Analyzing your plant images with AI...</p>
         </div>
 
         <div id="results" class="results">
-            <div id="plantType" class="result-card plant-type">
-                <div class="result-title">Plant Type</div>
+            <div id="plantIdentification" class="result-card plant-identification">
+                <div class="result-title">Plant Identification</div>
                 <div class="result-content" id="plantTypeContent"></div>
             </div>
             
-            <div id="diseaseStatus" class="result-card disease-status">
-                <div class="result-title">Disease Status</div>
-                <div class="result-content" id="diseaseStatusContent"></div>
+            <div id="healthStatus" class="result-card health-status">
+                <div class="result-title">Health Status</div>
+                <div class="result-meta">
+                    <div class="meta-item" id="severityBadge"></div>
+                    <div class="meta-item" id="confidenceBadge"></div>
+                </div>
+                <div class="result-content" id="healthStatusContent"></div>
             </div>
             
-            <div id="controlTreatment" class="result-card control-treatment">
-                <div class="result-title">Control & Treatment</div>
-                <div class="result-content" id="controlTreatmentContent"></div>
+            <div id="diseaseDetails" class="result-card disease-details">
+                <div class="result-title">Disease/Pest Details</div>
+                <div class="result-content" id="diseaseDetailsContent"></div>
+            </div>
+
+            <div id="symptoms" class="result-card symptoms">
+                <div class="result-title">Key Symptoms Observed</div>
+                <div class="result-content" id="symptomsContent"></div>
+            </div>
+            
+            <div id="treatment" class="result-card treatment">
+                <div class="result-title">Treatment Recommendations</div>
+                <div class="result-content" id="treatmentContent"></div>
+            </div>
+
+            <div id="prevention" class="result-card prevention">
+                <div class="result-title">Prevention Strategies</div>
+                <div class="result-content" id="preventionContent"></div>
+            </div>
+
+            <div id="processingInfo" class="processing-info">
+                <strong>Analysis Details:</strong>
+                <div id="processingDetails"></div>
             </div>
         </div>
 
@@ -412,6 +532,7 @@
     <script>
         const form = document.getElementById('uploadForm');
         const fileInput = document.getElementById('mediaInput');
+        const plantTypeInput = document.getElementById('plantType');
         const fileLabel = document.getElementById('fileLabel');
         const selectedFiles = document.getElementById('selectedFiles');
         const fileList = document.getElementById('fileList');
@@ -555,6 +676,12 @@
                 formData.append('media', file);
             });
 
+            // Add plant type if specified
+            const plantType = plantTypeInput.value.trim();
+            if (plantType) {
+                formData.append('plant_type', plantType);
+            }
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
@@ -564,7 +691,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    displayResults(data.analysis);
+                    displayResults(data.analysis, data.processing_info);
                     showMessage('Analysis completed successfully!', 'success');
                 } else {
                     showMessage(data.error || 'Analysis failed. Please try again.', 'error');
@@ -577,10 +704,49 @@
             }
         });
 
-        function displayResults(analysis) {
-            document.getElementById('plantTypeContent').textContent = analysis.plant_type;
-            document.getElementById('diseaseStatusContent').textContent = analysis.disease_status;
-            document.getElementById('controlTreatmentContent').textContent = analysis.control_treatment;
+        function displayResults(analysis, processingInfo) {
+            // Plant identification
+            document.getElementById('plantTypeContent').textContent = analysis.plant_type || 'Unknown';
+            
+            // Health status with severity and confidence badges
+            document.getElementById('healthStatusContent').textContent = analysis.health_status || 'Unknown';
+            
+            // Severity badge
+            const severityBadge = document.getElementById('severityBadge');
+            const severity = (analysis.severity || 'N/A').toLowerCase();
+            severityBadge.textContent = `Severity: ${analysis.severity || 'N/A'}`;
+            severityBadge.className = `meta-item severity-${severity}`;
+            
+            // Confidence badge
+            const confidenceBadge = document.getElementById('confidenceBadge');
+            const confidence = (analysis.confidence || 'Unknown').toLowerCase();
+            confidenceBadge.textContent = `Confidence: ${analysis.confidence || 'Unknown'}`;
+            confidenceBadge.className = `meta-item confidence-${confidence}`;
+            
+            // Disease/pest details
+            document.getElementById('diseaseDetailsContent').textContent = analysis.disease_pest || 'None detected';
+            
+            // Key symptoms
+            document.getElementById('symptomsContent').textContent = analysis.key_symptoms || 'No symptoms identified';
+            
+            // Treatment recommendations
+            document.getElementById('treatmentContent').textContent = analysis.treatment || 'No treatment needed';
+            
+            // Prevention strategies
+            document.getElementById('preventionContent').textContent = analysis.prevention || 'General plant care recommended';
+            
+            // Processing information
+            const processingDetails = document.getElementById('processingDetails');
+            if (processingInfo) {
+                processingDetails.innerHTML = `
+                    Files processed: <strong>${processingInfo.files_processed || 'Unknown'}</strong><br>
+                    Processing time: <strong>${processingInfo.processing_time || 'Unknown'}s</strong><br>
+                    Analysis timestamp: <strong>${new Date(analysis.analysis_timestamp || Date.now()).toLocaleString()}</strong>
+                `;
+            } else {
+                processingDetails.innerHTML = `Analysis completed at: <strong>${new Date().toLocaleString()}</strong>`;
+            }
+            
             results.style.display = 'block';
         }
 
@@ -590,6 +756,17 @@
                 message.innerHTML = '';
             }, 5000);
         }
+
+        // Auto-complete suggestions for plant types
+        const commonPlants = ['corn', 'maize', 'tomato', 'pepper', 'cassava', 'yam', 'plantain', 'cocoa', 'rice', 'beans', 'okra', 'millet', 'sorghum', 'cowpea'];
+        
+        plantTypeInput.addEventListener('input', function(e) {
+            // Simple autocomplete could be implemented here
+            const value = e.target.value.toLowerCase();
+            if (value && commonPlants.some(plant => plant.includes(value))) {
+                // Could show suggestions
+            }
+        });
 
         // Initialize
         analyzeBtn.disabled = true;
