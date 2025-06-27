@@ -159,29 +159,31 @@ def analyze_plant():
         return jsonify({'error': 'No media files selected'}), 400
 
     query = (
-    "You are analyzing an uploaded image or video of a corn (maize) plant in Ghana.\n\n"
-    "Only check for the following known corn issues:\n"
+    "Analyze the uploaded image or video. You are only expected to assess **corn (maize)** plants from Ghana.\n\n"
+    "Check specifically for the following known corn issues in Ghana:\n"
     "- Maize Streak Virus (disease)\n"
     "- Northern Corn Leaf Blight (disease)\n"
     "- Common Rust (disease)\n"
     "- Fall Armyworm (pest)\n"
     "- Stem Borers (pest)\n"
     "- Maize Weevils (post-harvest pest)\n\n"
-    "Do NOT mention vague terms like 'caterpillar' or 'worm' — if you identify a pest, use the correct name such as 'Fall Armyworm' or 'Stem Borer'.\n\n"
-    "When suggesting control or treatment, only give practical solutions used in Ghanaian farming contexts. DO NOT recommend introducing foreign species like ladybugs or lacewings.\n"
-    "Preferred control methods should include:\n"
-    "- Recommended local pesticides (like emamectin benzoate or neem-based solutions)\n"
-    "- Cultural practices (e.g., early planting, handpicking, crop rotation)\n"
-    "- Integrated Pest Management (IPM) where applicable\n\n"
-    "If the plant is healthy, clearly state: 'Healthy'.\n\n"
-    "Format your response like this:\n"
-    "1. Plant type: Maize (corn)\n"
-    "2. Disease or pest status:\n"
-    "   - Name:\n"
-    "   - Type:\n"
-    "   - Main impact:\n"
-    "   - Control or treatment:"
+    "Do NOT use vague terms like 'worm' or 'caterpillar'. You must use the **exact name** of the identified disease or pest.\n"
+    "Do NOT suggest introducing foreign insects like ladybugs. Use **practical, local control methods** relevant to Ghanaian farmers.\n\n"
+    "Only analyze maize. If the uploaded image is not a maize plant, reply with:\n"
+    "'1. Plant type: Not maize'\n"
+    "'2. Disease status: Not applicable'\n"
+    "'3. Control or treatment: Not applicable'\n\n"
+    "If the maize plant is healthy, state 'Healthy' as the disease status.\n\n"
+    "When giving control or treatment, keep it 2–3 lines long, and suggest real-world solutions such as:\n"
+    "- Use of approved pesticides (e.g., emamectin benzoate, neem-based products)\n"
+    "- Early planting, crop rotation, handpicking pests, or proper drying and storage for weevils\n"
+    "- Field hygiene and resistant varieties\n\n"
+    "Respond using this exact format:\n"
+    "1. Plant type:\n"
+    "2. Disease status:\n"
+    "3. Control or treatment:"
 )
+
 
 
 
