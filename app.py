@@ -166,18 +166,19 @@ def analyze_plant():
         }
 
         payload = {
-            "model": "meta/llama-4-maverick-17b-128e-instruct",
+            "model": "nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
             "messages": [
                 {
                     "role": "user",
-                    "content": f"{query} <img src=\"data:image/{ext};base64,{image_b64}\" />"
+                    "content": [
+                        { "type": "image_url", "image_url": { "url": f"data:image/{ext};base64,{image_b64}" } },
+                        { "type": "text", "text": query }
+                    ]
                 }
             ],
-            "max_tokens": 512,
-            "temperature": 0.2,
-            "top_p": 0.9,
-            "frequency_penalty": 0.0,
-            "presence_penalty": 0.0,
+            "temperature": 1.00,
+            "top_p": 0.01,
+            "max_tokens": 1024,
             "stream": False
         }
 

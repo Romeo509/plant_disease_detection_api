@@ -4,3 +4,5 @@ werkzeug
 uuid
 typing
 pathlib
+
+openai
