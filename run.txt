@@ -1,0 +1,48 @@
+Plant Disease Detection API - How to Use
+
+API ENDPOINT:
+POST /analyze
+
+REQUEST FORMAT:
+- Method: POST
+- Content-Type: multipart/form-data
+- Parameter: "media" (file upload)
+
+SUPPORTED FILE FORMATS:
+- Images: JPG, PNG, JPEG
+- Max file size: 16MB
+
+EXAMPLE REQUEST (cURL):
+curl -X POST http://localhost:5000/analyze \
+  -F "media=@plant_image.jpg" \
+  -H "Accept: application/json"
+
+EXAMPLE REQUEST (Python):
+import requests
+
+url = "http://localhost:5000/analyze"
+files = {"media": open("plant_image.jpg", "rb")}
+
+response = requests.post(url, files=files)
+result = response.json()
+
+EXAMPLE SUCCESSFUL RESPONSE:
+{
+  "success": true,
+  "analysis": {
+    "plant_type": "Tomato (Solanum lycopersicum)",
+    "disease_status": "Early Blight (Alternaria solani) - Fungal infection causing brown spots on leaves",
+    "control_treatment": "Apply copper-based fungicide weekly. Remove affected leaves and improve air circulation."
+  },
+  "raw_response": "1. Plant type: Tomato (Solanum lycopersicum)..."
+}
+
+EXAMPLE ERROR RESPONSE:
+{
+  "error": "No media files uploaded"
+}
+
+STATUS CODES:
+- 200: Success
+- 400: Bad Request (missing files, unsupported format)
+- 500: Internal Server Error (AI model unavailable)
